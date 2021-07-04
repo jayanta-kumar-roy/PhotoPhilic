@@ -1,19 +1,17 @@
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
 import './App.css';
 import Post from './Post'
+import {db} from './firebase'
+
 function App() {
-const [posts,setPosts]=useState([
-    {
-      username:"Jayanta" ,
-      caption:"this is so cool", 
-      imageUrl:"https://images.unsplash.com/photo-1622495546323-5dac33dedb01?ixid=MnwxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHw2fHx8ZW58MHx8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=60"
-    },
-    {
-      username:"Touqeer" ,
-      caption:"I'm loving this" ,
-      imageUrl:"https://images.unsplash.com/photo-1625231066641-7ab5b9c234d3?ixid=MnwxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw5fHx8ZW58MHx8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=60"
-    }
-]);
+const [posts,setPosts]=useState([]);
+
+  useEffect(()=>{
+    db.collection('posts').onSnapshot(snapshot=>{
+      //every time a new post is added ,this codes fires off
+      setPosts(snapshot.docs.map(doc=>doc.data()));
+    })
+  },[]);
 
   return (
     <div className="app">
