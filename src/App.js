@@ -9,7 +9,10 @@ const [posts,setPosts]=useState([]);
   useEffect(()=>{
     db.collection('posts').onSnapshot(snapshot=>{
       //every time a new post is added ,this codes fires off
-      setPosts(snapshot.docs.map(doc=>doc.data()));
+      setPosts(snapshot.docs.map(doc=>({
+        id:doc.id,
+        post:doc.data()
+      })));
     })
   },[]);
 
@@ -24,8 +27,8 @@ const [posts,setPosts]=useState([]);
       <h1>Lets Build our photophilic app</h1>
       
       {
-        posts.map(post=>(
-          <Post username={post.username} caption={post.caption} imageUrl={post.imageUrl}/>
+        posts.map(({id,post})=>(
+          <Post  key={id} username={post.username} caption={post.caption} imageUrl={post.imageUrl}/>
         ))
       } 
       
