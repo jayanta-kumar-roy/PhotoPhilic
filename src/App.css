@@ -1,10 +1,10 @@
-*{ 
+*{
   margin:0;
 }
 
-.App{
+.app{
   background-color: #fafafa;
-  height:100vh;
+  
 }
 
 .app__header{
