@@ -1,7 +1,7 @@
 import React,{useState,useEffect} from 'react';
 import './App.css';
 import Post from './Post';
-import {db} from './firebase';
+import {db,auth} from './firebase';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import { Button,Input } from '@material-ui/core';
@@ -39,8 +39,37 @@ const [open,setOpen] = useState(false);
 const [username,setUsername] = useState(''); 
 const [password,setPassword] = useState(''); 
 const [email,setEmail] = useState(''); 
+const [user,setUser]= useState(null);
 
-  useEffect(()=>{
+
+useEffect(()=>{
+  const unsubscribe=auth.onAuthStateChanged((authUser)=>{
+    if(authUser){
+      //user has logged in...
+      console.log(authUser);
+      setUser(authUser);
+      // if(authUser.displayName){
+      //   // dont update displayname
+      // }
+      // else{
+      //   // if we just created someone
+      //   return authUser.updateProfile({
+      //     displayName:username,
+      //   });
+      // }
+    }
+    else{
+      //user has logged out...
+      setUser(null);
+    }
+  })
+  return ()=>{
+    //perform some cleanup action
+    unsubscribe();
+  }
+},[user,username]);
+
+useEffect(()=>{
     db.collection('posts').onSnapshot(snapshot=>{
       //every time a new post is added ,this codes fires off
       setPosts(snapshot.docs.map(doc=>({
@@ -51,6 +80,16 @@ const [email,setEmail] = useState('');
   },[]);
 
   const signUp =(event)=>{
+      event.preventDefault();
+
+      auth.createUserWithEmailAndPassword(email, password)
+      .then((authUser)=>{
+        return authUser.user.updateProfile({
+          displayName:username
+        })
+      })
+      .catch((error)=>alert(error.message));
+
 
   }
   
@@ -96,7 +135,7 @@ const [email,setEmail] = useState('');
           src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
         ></img>
       </div>
-      <Button onClick={() => setOpen(true)}>Sign up</Button>
+      <Button type="submit" onClick={() => setOpen(true)}>Sign up</Button>
 
       <h1>Lets Build our photophilic app</h1>
 
